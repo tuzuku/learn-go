@@ -1,45 +1,25 @@
 package main
 
-import ( 
+import (
 	"fmt"
-	"github.com/go-redis/redis"
-	"context"
+	"time"
+
+	redisutil "redisutils/redisutils"
 )
 
-
 func main() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379",
-		Password: "",
-		DB: 0,
-	})
-
-	pong,err := rdb.Ping().Result()
+	client := redisutil.NewClient()
+	err := client.Set("key", "TUZUKU", 10*time.Minute)
 	if err != nil {
-		fmt.Println("Error:",err)
-		return
-	}
-	fmt.Println("PING response: ",pong)
-
-	err = rdb.Set( "key", "value", 0).Err()
-	if err != nil {
-		fmt.Println("Error:",err)
+		fmt.Println("Error:", err)
 		return
 	}
 
-	val,err := rdb.Get( "key").Result()
+	val, err := client.Get("key")
 	if err != nil {
-		fmt.Println("Error:",err)
+		fmt.Println("Error:", err)
 		return
 	}
-	fmt.Println("key",val)
-
-	_,err = rdb.Del( "key").Result()
-	if err != nil {
-		fmt.Println("Error:",err)
-		return
-	}
-	fmt.Println("key deleted")
-
+	fmt.Println("Value:", val)
 
 }
